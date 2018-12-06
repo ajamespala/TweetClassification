@@ -16,6 +16,7 @@ p.progress(0, pbartotal)
 filename = 'data/test.txt'
 data = open(filename).read()
 print(filename)
+print("Only working for first 2200 entries!! (Change in code)")
 labels, texts = [], []
 for i, line in enumerate(data.split("\n")):
     content = line.split()
@@ -369,6 +370,11 @@ classifier = create_model_architecture(xtrain_tfidf_ngram.shape[1])
 accuracySNN = train_model(classifier, xtrain_tfidf_ngram, train_y, xvalid_tfidf_ngram, is_neural_net=True)
 print ("NN, Ngram Level TF IDF Vectors: ",  accuracySNN, flush=True)
 
+p.progress(35, pbartotal)
+classifier = create_model_architecture(xtrain_tfidf.shape[1])
+accuracySNNW = train_model(classifier, xtrain_tfidf, train_y, xvalid_tfidf, is_neural_net=True)
+print ("NN, Word Level TF IDF Vectors: ",  accuracySNNW, flush=True)
+
 p.progress(36, pbartotal)
 classifier = create_cnn()
 accuracyCNN = train_model(classifier, train_seq_x, train_y, valid_seq_x, is_neural_net=True)
@@ -413,6 +419,7 @@ print ("Xgb, WordLevel TF-IDF: ", accuracyXGWL)
 print ("Xgb, CharLevel Vectors: ", accuracyXGCL)
 print ("-------------------------------------------")
 print ("NN, Ngram Level TF IDF Vectors: ",  accuracySNN)
+print ("NN, Word Level TF IDF Vectors: ",  accuracySNNW,)
 print ("CNN, Word Embeddings: ",  accuracyCNN)
 print ("RNN-LSTM, Word Embeddings: ",  accuracyRNN)
 print ("RNN-GRU, Word Embeddings: ",  accuracyRNNGRU)
