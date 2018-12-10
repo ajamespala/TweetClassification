@@ -8,6 +8,11 @@ import xgboost
 from keras.preprocessing import text, sequence
 from keras import layers, models, optimizers
 import nltk
+
+# import for NLTK stemming
+from nltk.stem import PorterStemmer
+from nltk.tokenize import sent_tokenize, word_tokenize
+
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
@@ -34,6 +39,15 @@ with open('good_tweets.txt', 'w') as f:
 	f.write('\n'.join([l for l in ret]))
 data = open('good_tweets.txt').read()
 
+# implement stemming
+ps = PorterStemmer()
+stem_dict = ["fire", "fires", "firing", "flood", "flooding", "floods", "bombings", "bomb", "bombs", "earthquake", "earthquakes", "exploding", "exploded", "explodes", "explosion", "explosions", "wildfires", "wildfire", "typhoons", "typhoon", "meteorites", "meteors", "meteorite", "meteor", "collapsing", "collapse", "collapses", "haze", "hazing", "hazes", "derails", "derailed", "derailment", "shooting", "shooter", "shootings", "crash", "crashes", "crashing", "crashed", "shot", "shots"] # this isn't right, TOOD: will check
+
+for line in data:
+	words = word_tokenize(line)
+	for w in words:
+		# write to new file instead of printing???
+		print(ps.stem(w))
 
 print("Only working for first 2200 entries!! (Change in code)")
 labels, texts = [], []
