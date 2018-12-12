@@ -10,21 +10,25 @@ pbartotal = 9
 
 p.progress(0, pbartotal)
 # load the dataset
-filename = 'data/test4.txt'
+filename = 'data/data15.txt'
 data = open(filename).read()
 print(filename)
-print("Only working for first 3202 entries!! (Change in code)")
 labels, texts = [], []
 for i, line in enumerate(data.split("\n")):
     content = line.split()
 # text4 -> 4642
 # text3 -> 3200
-    if(i < 4642):
+# data24 -> 24158
+# data15 and data15unsorted -> 24389
+    if(i < 24158):
         labels.append(content[0])
         texts.append(content[1:])
-
-for label in labels:
-    print(label)
+#i = 0
+#for label in labels:
+#    categories.append([i, label])
+#    i++;
+#for label in labels:
+#    print(label)
 
 p.progress(2, pbartotal)
 # create a dataframe using texts and lables
@@ -53,7 +57,7 @@ print(valid_y)
 
 p.progress(5, pbartotal)
 # create a count vectorizer object 
-count_vect = CountVectorizer(analyzer='word',  stop_words = {'english'}, token_pattern=r'\w{1,}', max_features = 2000)
+count_vect = CountVectorizer(analyzer='word',  stop_words = {'english'}, token_pattern='\w{1,}', max_features = 10000)
 count_vect.fit(trainDF['text'])
 print(count_vect.get_feature_names())
 print(count_vect.get_stop_words())
@@ -67,15 +71,16 @@ print(xtrain_count.toarray()[0])
 p.progress(9, pbartotal)
 
 input_dim = xtrain_count.shape[1]
+print(xtrain_count.shape)
 print(input_dim)
 model = Sequential()
-#model.add(layers.Dense(20, input_dim=input_dim, activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
-model.add(layers.Dense(4, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
+#model.add(layers.Dense(100, input_dim=input_dim, activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
+model.add(layers.Dense(15, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 model.summary()
 
-history = model.fit(xtrain_count, train_y, epochs=1, verbose=1, validation_data=(xvalid_count, valid_y), batch_size=32)
+history = model.fit(xtrain_count, train_y, epochs=3, verbose=2, validation_data=(xvalid_count, valid_y), batch_size=32)
 
 
 print(model.get_weights())
@@ -93,19 +98,43 @@ print("Testing Accuracy:  {:.6f}".format(accuracy))
 #for sample in samples:
 text1 = ['Meteor injures 725 in Russia: The meteor streaked through the skies over Russia\'s southern Chelyabinsk region']
 text2 = ['New York train crash probe begins: The US authorities begin an investigation into the causes of Sunday\'s New Y... http://t.co/RS6ku9393B']
+text3 = ['The train crash was horrible. Praying for the victims']
 #content =sample.split()
 #texts.append(content[1:])
     
 #trainDF = pandas.DataFrame()
 #texts1=[' '.join(line) for line in texts]
 
+#def largest(results):
+#    toReturn = []
+#    for result in results:
+#        biggest = 0;
+#        for r in result:
+#            if(r > biggest):
+#               biggest = r
+#        if biggest == 0:
+#            return -1
+#    
+
 # transform the training and validation data using count vectorizer object
 x_to_predict =  count_vect.transform(text1)
-
 result = model.predict(x_to_predict, verbose=1)
 print(result[0])
 
 x_to_predict =  count_vect.transform(text2)
-
 result = model.predict(x_to_predict, verbose=1)
 print(result[0])
+
+x_to_predict =  count_vect.transform(text3)
+result = model.predict(x_to_predict, verbose=1)
+print(result[0])
+total = 0
+for r in result[0]:
+    total += r
+
+
+print(total)
+print(lb.classes_)
+
+print(result)
+
