@@ -11,7 +11,27 @@ pbartotal = 9
 p.progress(0, pbartotal)
 # load the dataset
 filename = 'data/data15.txt'
-data = open(filename).read()
+
+# get stop words list
+with open('english.txt', 'r') as f:
+	stop_words = set(f.read().splitlines())
+
+def remove_stop_words(l, stop_words):
+	''' Returns the line without stop words (words that are in the english file) '''
+	l = ' '.join([w for w in l.split() if w not in stop_words])
+	return l
+
+# remove stop words and call func
+with open(filename, 'r') as f:
+	content = f.read().splitlines()
+	ret = [remove_stop_words(l, stop_words) for l in content]
+
+# write new lines without stop words to a new file
+with open('good_tweets.txt', 'w') as f:
+	f.write('\n'.join([l for l in ret]))
+
+# data = open('good_tweets.txt').read()  # w/o stop words
+data = open(filename).read()  # with stop words
 print(filename)
 labels, texts = [], []
 for i, line in enumerate(data.split("\n")):

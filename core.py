@@ -18,7 +18,7 @@ with open ('english.txt', 'r') as f:
 
 def remove_stop_words(l, stop_words):
 	''' Returns the line without   '''
-	l = ' '.join([w for w in l.split() if w not in bad_words])
+	l = ' '.join([w for w in l.split() if w not in stop_words])
 	return l
 
 
