@@ -8,8 +8,29 @@ import keras.constraints
 
 
 # load the dataset
-filename = 'data/test4.txt'
-data = open(filename).read()
+filename = 'data/test.txt'
+# data = open(filename).read()
+print(filename)
+
+# get stop words list
+with open ('english.txt', 'r') as f:
+	stop_words = set(f.read().splitlines())
+
+def remove_stop_words(l, stop_words):
+	''' Returns the line without   '''
+	l = ' '.join([w for w in l.split() if w not in bad_words])
+	return l
+
+
+# remove stop words
+with open(filename, 'r') as f:
+	content = f.read().splitlines()
+	ret = [remove_stop_words(l, stop_words) for l in content]
+with open('good_tweets.txt', 'w') as f:
+	f.write('\n'.join([l for l in ret]))
+data = open('good_tweets.txt').read()
+
+print("Only working for first 2200 entries!! (Change in code)")
 labels, texts = [], []
 for i, line in enumerate(data.split("\n")):
     content = line.split()
