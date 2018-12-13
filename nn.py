@@ -54,13 +54,6 @@ for i, line in enumerate(data.split("\n")):
     if(i < int(numEntries)):
         labels.append(content[0])
         texts.append(content[1:])
-#i = 0
-#for label in labels:
-#    categories.append([i, label])
-#    i++;
-#for label in labels:
-#    print(label)
-
 p.progress(2, pbartotal)
 # create a dataframe using texts and lables
 trainDF = pandas.DataFrame()
@@ -70,19 +63,19 @@ trainDF['label'] = labels
 
 p.progress(3, pbartotal)
 train_x, valid_x, train_y, valid_y = model_selection.train_test_split(trainDF['text'], trainDF['label'])
-
+train_x = enumerate(train_x)
 p.progress(4, pbartotal)
 # label encode the target variable 
 lb = preprocessing.LabelBinarizer()
 train_y = lb.fit_transform(train_y)
 #print(lb)
-#print(lb.classes_)
+print(lb.classes_)
+exit(0)
 #print(train_y)
 print('_________________________')
 lb = preprocessing.LabelBinarizer()
 valid_y = lb.fit_transform(valid_y)
-#print(lb)
-#print(lb.classes_)
+print(lb.classes_)
 #print(valid_y)
 
 p.progress(5, pbartotal)
@@ -135,17 +128,6 @@ text3 = ['The train crash was horrible. Praying for the victims']
 #trainDF = pandas.DataFrame()
 #texts1=[' '.join(line) for line in texts]
 
-#def largest(results):
-#    toReturn = []
-#    for result in results:
-#        biggest = 0;
-#        for r in result:
-#            if(r > biggest):
-#               biggest = r
-#        if biggest == 0:
-#            return -1
-#    
-
 def func(text):
 	x_to_predict =  count_vect.transform(text)
 	result = model.predict(x_to_predict, verbose=1)
@@ -154,38 +136,54 @@ def func(text):
 	return label_index
 
 
+def test(testDF, lb):
+	#labels = # convert pandas data frame to
+	text = testDF['text'] 
+	labels = testDF['label'] 
+	labels = lb.transform(labels)
+	num_correct = 0
+	for i, t in enumerate(text):
+		ind = func(t)
+		if ind == i:
+			num_correct = num_correct + 1
+	return num_correct
+
 # transform the training and validation data using count vectorizer object
 print(func(text1))
 #x_to_predict =  count_vect.transform(text1)
 #result = model.predict(x_to_predict, verbose=1)
-#print(result[0])
 
 print(func(text2))
-#x_to_predict =  count_vect.transform(text2)
-#result = model.predict(x_to_predict, verbose=1)
-#print(result[0])
-
 print(func(text3))
-#x_to_predict =  count_vect.transform(text3)
-#result = model.predict(x_to_predict, verbose=1)
-#print(result[0])
-#total = 0
-#for r in result[0]:
-#    total += r
 
-#print(total)
-print(lb.classes_)
-#print(result)
+#print(lb.classes_)
 
 
-'''
-def find_max(result):
-	max_result = 0
-	for r in result[0]:
-		if r > max_result:
-			max_result = r
-
-	return max_result
-	# coordinate max in set with label
-'''
 # TODO: call on data set to get accuracy score	
+p.progress(0, pbartotal)
+
+# setting filename to the file without stop words
+filename = output_file2
+data = open(filename).read()  
+labels, texts = [], []
+# text4 -> 4642
+# text3 -> 3200
+# data24 -> 24158
+# data15 and data15unsorted -> 24389
+# sentiment -> 988
+numEntries = 24158
+for i, line in enumerate(data.split("\n")):
+    content = line.split()
+    if(i < int(numEntries)):
+        labels.append(content[0])
+        texts.append(content[1:])
+p.progress(2, pbartotal)
+# create a dataframe using texts and lables
+testDF = pandas.DataFrame()
+texts1=[' '.join(line) for line in texts]
+testDF['text'] = texts1
+testDF['label'] = labels
+
+numCorrect = test(testDF, lb)
+
+print("Test: " + numCorrect + " out of " +numEntries+ "correct")
