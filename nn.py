@@ -120,6 +120,7 @@ text3 = ['The train crash was horrible. Praying for the victims']
 #texts1=[' '.join(line) for line in texts]
 
 def func(text):
+	text = str(text)
 	text = [text]
 	print(type(text))
 	x_to_predict =  count_vect.transform(text)
@@ -131,12 +132,14 @@ def func(text):
 
 def test(testDF, lb):
 	#labels = # convert pandas data frame to
-	text = testDF['text'].value 
-	labels = testDF['label'].value
+	text = testDF['text'] 
+	labels = testDF['label']
 	labels = lb.transform(labels)
 	num_correct = 0
 	for i, t in enumerate(text):
 		ind = func(t)
+		print(t)
+		print(str(ind))
 		if ind == i:
 			num_correct = num_correct + 1
 	return num_correct
@@ -177,4 +180,4 @@ testDF['label'] = labels
 
 numCorrect = test(testDF, lb)
 
-print("Test: " + numCorrect + " out of " +numEntries+ "correct")
+print("Test: " + str(numCorrect) + " out of " + str(numEntries)+ "correct")
