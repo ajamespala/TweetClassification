@@ -1,5 +1,6 @@
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-import pandas, numpy, textblob, string
+import pandas, textblob, string
+import numpy as np
 import progress as p
 from sklearn import model_selection, preprocessing, linear_model, naive_bayes, metrics, svm
 from keras.models import Sequential
@@ -10,7 +11,10 @@ pbartotal = 9
 
 p.progress(0, pbartotal)
 # load the dataset
-filename = 'data/test4.txt'
+filename = 'data/data25.txt'
+testfile = 'data/data_4.txt'
+output_file = 'good_tweets.txt'
+output_file2 = 'good_tweets_2.txt'
 
 # get stop words list
 with open('english.txt', 'r') as f:
@@ -21,14 +25,19 @@ def remove_stop_words(l, stop_words):
 	l = ' '.join([w for w in l.split() if w not in stop_words])
 	return l
 
-# remove stop words and call func
-with open(filename, 'r') as f:
-	content = f.read().splitlines()
-	ret = [remove_stop_words(l, stop_words) for l in content]
 
-# write new lines without stop words to a new file
-with open('good_tweets.txt', 'w') as f:
-	f.write('\n'.join([l for l in ret]))
+def create_new_file(filename, stop_words, output_file):
+	# remove stop words and call func
+	with open(filename, 'r') as f:
+		content = f.read().splitlines()
+		ret = [remove_stop_words(l, stop_words) for l in content]
+
+	# write new lines without stop words to a new file
+	with open(output_file, 'w') as f:
+		f.write('\n'.join([l for l in ret]))
+
+create_new_file(filename, stop_words, output_file)
+create_new_file(testfile, stop_words, output_file2)
 
 # setting filename to the file without stop words
 filename = 'good_tweets.txt'
@@ -39,7 +48,7 @@ labels, texts = [], []
 # data24 -> 24158
 # data15 and data15unsorted -> 24389
 # sentiment -> 988
-numEntries = 4642
+numEntries = 24158
 for i, line in enumerate(data.split("\n")):
     content = line.split()
     if(i < int(numEntries)):
@@ -95,7 +104,7 @@ input_dim = xtrain_count.shape[1]
 #print(xtrain_count.shape)
 #print(input_dim)
 model = Sequential()
-numCategories = 4
+numCategories = 25
 #model.add(layers.Dense(100, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 model.add(layers.Dense(numCategories, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 
@@ -137,32 +146,46 @@ text3 = ['The train crash was horrible. Praying for the victims']
 #            return -1
 #    
 
-# transform the training and validation data using count vectorizer object
-x_to_predict =  count_vect.transform(text1)
-result = model.predict(x_to_predict, verbose=1)
-print(result[0])
-
-x_to_predict =  count_vect.transform(text2)
-result = model.predict(x_to_predict, verbose=1)
-print(result[0])
-
-x_to_predict =  count_vect.transform(text3)
-result = model.predict(x_to_predict, verbose=1)
-print(result[0])
-total = 0
-for r in result[0]:
-    total += r
-
-
-print(total)
-print(lb.classes_)
-
-print(result)
-
-def func():
-	x_to_predict =  count_vect.transform(text3)
+def func(text):
+	x_to_predict =  count_vect.transform(text)
 	result = model.predict(x_to_predict, verbose=1)
 	# fina max result[0]
-	# coordinate max in set with label
+	label_index = np.argmax(result[0])	
+	return label_index
 
+
+# transform the training and validation data using count vectorizer object
+print(func(text1))
+#x_to_predict =  count_vect.transform(text1)
+#result = model.predict(x_to_predict, verbose=1)
+#print(result[0])
+
+print(func(text2))
+#x_to_predict =  count_vect.transform(text2)
+#result = model.predict(x_to_predict, verbose=1)
+#print(result[0])
+
+print(func(text3))
+#x_to_predict =  count_vect.transform(text3)
+#result = model.predict(x_to_predict, verbose=1)
+#print(result[0])
+#total = 0
+#for r in result[0]:
+#    total += r
+
+#print(total)
+print(lb.classes_)
+#print(result)
+
+
+'''
+def find_max(result):
+	max_result = 0
+	for r in result[0]:
+		if r > max_result:
+			max_result = r
+
+	return max_result
+	# coordinate max in set with label
+'''
 # TODO: call on data set to get accuracy score	
