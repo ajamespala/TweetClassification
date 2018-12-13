@@ -10,7 +10,7 @@ pbartotal = 9
 
 p.progress(0, pbartotal)
 # load the dataset
-filename = 'sentiments.txt'
+filename = 'data/test4.txt'
 
 # get stop words list
 with open('english.txt', 'r') as f:
@@ -39,7 +39,7 @@ labels, texts = [], []
 # data24 -> 24158
 # data15 and data15unsorted -> 24389
 # sentiment -> 988
-numEntries = 988
+numEntries = 4642
 for i, line in enumerate(data.split("\n")):
     content = line.split()
     if(i < int(numEntries)):
@@ -89,21 +89,20 @@ xtrain_count =  count_vect.transform(train_x)
 xvalid_count =  count_vect.transform(valid_x)
 #print(xtrain_count.toarray()[0])
 
-p.progress(9, pbartotal)
+p.progress(7, pbartotal)
 
 input_dim = xtrain_count.shape[1]
 #print(xtrain_count.shape)
 #print(input_dim)
 model = Sequential()
-#model.add(layers.Dense(100, input_dim=input_dim, activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
-numCategories = 3
+numCategories = 4
 #model.add(layers.Dense(100, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 model.add(layers.Dense(numCategories, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 model.summary()
 
-history = model.fit(xtrain_count, train_y, epochs=5, verbose=2, validation_data=(xvalid_count, valid_y), batch_size=32)
+history = model.fit(xtrain_count, train_y, epochs=3, verbose=2, validation_data=(xvalid_count, valid_y), batch_size=32)
 
 #print(model.get_weights())
 weights = model.get_weights()
@@ -160,3 +159,10 @@ print(lb.classes_)
 
 print(result)
 
+def func():
+	x_to_predict =  count_vect.transform(text3)
+	result = model.predict(x_to_predict, verbose=1)
+	# fina max result[0]
+	# coordinate max in set with label
+
+# TODO: call on data set to get accuracy score	
