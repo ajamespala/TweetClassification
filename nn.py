@@ -9,10 +9,9 @@ import keras.constraints
 
 pbartotal = 9
 
-p.progress(0, pbartotal)
 # load the dataset
-filename = 'data/data25.txt'
-testfile = 'data/data_4.txt'
+filename = 'data/ThisIsTheOne.txt'
+testfile = 'data/4missing.txt'
 output_file = 'good_tweets.txt'
 output_file2 = 'good_tweets_2.txt'
 
@@ -48,29 +47,24 @@ labels, texts = [], []
 # data24 -> 24158
 # data15 and data15unsorted -> 24389
 # sentiment -> 988
-numEntries = 24158
+numEntries = 22250
 for i, line in enumerate(data.split("\n")):
     content = line.split()
     if(i < int(numEntries)):
         labels.append(content[0])
         texts.append(content[1:])
-p.progress(2, pbartotal)
 # create a dataframe using texts and lables
 trainDF = pandas.DataFrame()
 texts1=[' '.join(line) for line in texts]
 trainDF['text'] = texts1
 trainDF['label'] = labels
 
-p.progress(3, pbartotal)
 train_x, valid_x, train_y, valid_y = model_selection.train_test_split(trainDF['text'], trainDF['label'])
-train_x = enumerate(train_x)
-p.progress(4, pbartotal)
 # label encode the target variable 
 lb = preprocessing.LabelBinarizer()
 train_y = lb.fit_transform(train_y)
 #print(lb)
 print(lb.classes_)
-exit(0)
 #print(train_y)
 print('_________________________')
 lb = preprocessing.LabelBinarizer()
@@ -78,26 +72,23 @@ valid_y = lb.fit_transform(valid_y)
 print(lb.classes_)
 #print(valid_y)
 
-p.progress(5, pbartotal)
 # create a count vectorizer object 
 count_vect = CountVectorizer(analyzer='word',  stop_words = {'english'}, token_pattern='\w{1,}', max_features = 10000)
 count_vect.fit(trainDF['text'])
 #print(count_vect.get_feature_names())
 #print(count_vect.get_stop_words())
-
-p.progress(6, pbartotal)
+print(train_x)
 # transform the training and validation data using count vectorizer object
 xtrain_count =  count_vect.transform(train_x)
 xvalid_count =  count_vect.transform(valid_x)
 #print(xtrain_count.toarray()[0])
 
-p.progress(7, pbartotal)
 
 input_dim = xtrain_count.shape[1]
 #print(xtrain_count.shape)
 #print(input_dim)
 model = Sequential()
-numCategories = 25
+numCategories = 14
 #model.add(layers.Dense(100, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 model.add(layers.Dense(numCategories, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 
@@ -129,6 +120,8 @@ text3 = ['The train crash was horrible. Praying for the victims']
 #texts1=[' '.join(line) for line in texts]
 
 def func(text):
+	text = [text]
+	print(type(text))
 	x_to_predict =  count_vect.transform(text)
 	result = model.predict(x_to_predict, verbose=1)
 	# fina max result[0]
@@ -138,8 +131,8 @@ def func(text):
 
 def test(testDF, lb):
 	#labels = # convert pandas data frame to
-	text = testDF['text'] 
-	labels = testDF['label'] 
+	text = testDF['text'].value 
+	labels = testDF['label'].value
 	labels = lb.transform(labels)
 	num_correct = 0
 	for i, t in enumerate(text):
@@ -160,7 +153,6 @@ print(func(text3))
 
 
 # TODO: call on data set to get accuracy score	
-p.progress(0, pbartotal)
 
 # setting filename to the file without stop words
 filename = output_file2
@@ -171,13 +163,12 @@ labels, texts = [], []
 # data24 -> 24158
 # data15 and data15unsorted -> 24389
 # sentiment -> 988
-numEntries = 24158
+numEntries = 3684
 for i, line in enumerate(data.split("\n")):
     content = line.split()
     if(i < int(numEntries)):
         labels.append(content[0])
         texts.append(content[1:])
-p.progress(2, pbartotal)
 # create a dataframe using texts and lables
 testDF = pandas.DataFrame()
 texts1=[' '.join(line) for line in texts]
