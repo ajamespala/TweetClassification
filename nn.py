@@ -10,7 +10,7 @@ pbartotal = 9
 
 p.progress(0, pbartotal)
 # load the dataset
-filename = 'data/data15.txt'
+filename = 'sentiments.txt'
 
 # get stop words list
 with open('english.txt', 'r') as f:
@@ -30,17 +30,19 @@ with open(filename, 'r') as f:
 with open('good_tweets.txt', 'w') as f:
 	f.write('\n'.join([l for l in ret]))
 
-# data = open('good_tweets.txt').read()  # w/o stop words
-data = open(filename).read()  # with stop words
-print(filename)
+# setting filename to the file without stop words
+filename = 'good_tweets.txt'
+data = open(filename).read()  
 labels, texts = [], []
-for i, line in enumerate(data.split("\n")):
-    content = line.split()
 # text4 -> 4642
 # text3 -> 3200
 # data24 -> 24158
 # data15 and data15unsorted -> 24389
-    if(i < 24158):
+# sentiment -> 988
+numEntries = 988
+for i, line in enumerate(data.split("\n")):
+    content = line.split()
+    if(i < int(numEntries)):
         labels.append(content[0])
         texts.append(content[1:])
 #i = 0
@@ -60,50 +62,50 @@ trainDF['label'] = labels
 p.progress(3, pbartotal)
 train_x, valid_x, train_y, valid_y = model_selection.train_test_split(trainDF['text'], trainDF['label'])
 
-
 p.progress(4, pbartotal)
 # label encode the target variable 
 lb = preprocessing.LabelBinarizer()
 train_y = lb.fit_transform(train_y)
-print(lb)
-print(lb.classes_)
-print(train_y)
+#print(lb)
+#print(lb.classes_)
+#print(train_y)
 print('_________________________')
 lb = preprocessing.LabelBinarizer()
 valid_y = lb.fit_transform(valid_y)
-print(lb)
-print(lb.classes_)
-print(valid_y)
+#print(lb)
+#print(lb.classes_)
+#print(valid_y)
 
 p.progress(5, pbartotal)
 # create a count vectorizer object 
 count_vect = CountVectorizer(analyzer='word',  stop_words = {'english'}, token_pattern='\w{1,}', max_features = 10000)
 count_vect.fit(trainDF['text'])
-print(count_vect.get_feature_names())
-print(count_vect.get_stop_words())
+#print(count_vect.get_feature_names())
+#print(count_vect.get_stop_words())
 
 p.progress(6, pbartotal)
 # transform the training and validation data using count vectorizer object
 xtrain_count =  count_vect.transform(train_x)
 xvalid_count =  count_vect.transform(valid_x)
-print(xtrain_count.toarray()[0])
+#print(xtrain_count.toarray()[0])
 
 p.progress(9, pbartotal)
 
 input_dim = xtrain_count.shape[1]
-print(xtrain_count.shape)
-print(input_dim)
+#print(xtrain_count.shape)
+#print(input_dim)
 model = Sequential()
 #model.add(layers.Dense(100, input_dim=input_dim, activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
-model.add(layers.Dense(15, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
+numCategories = 3
+#model.add(layers.Dense(100, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
+model.add(layers.Dense(numCategories, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 model.summary()
 
-history = model.fit(xtrain_count, train_y, epochs=3, verbose=2, validation_data=(xvalid_count, valid_y), batch_size=32)
+history = model.fit(xtrain_count, train_y, epochs=5, verbose=2, validation_data=(xvalid_count, valid_y), batch_size=32)
 
-
-print(model.get_weights())
+#print(model.get_weights())
 weights = model.get_weights()
 for layer in model.layers:
     print(layer.name,layer.input_shape, layer.output_shape)
