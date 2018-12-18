@@ -1,3 +1,12 @@
+'''
+Filename: nn.py
+Names: James Pala, Marcus Rogers, & Taylor Wong
+Date: December 18th, 2018
+Project: Tweet Classification Program 
+Description: Program that trains the net with supervised data to correctly classify the 
+Tweets into specific categories and tests with new data.  The data sets consist of 15 different
+crisis events, 25 different crisis event and location, and sentiment analysis.
+'''
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 import pandas, textblob, string
 import numpy as np
@@ -14,7 +23,7 @@ def remove_stop_words(l, stop_words):
 
 
 def create_new_file(filename, stop_words, output_file):
-	# remove stop words and call func
+	''' remove stop words from filename and saves to output_file '''
 	with open(filename, 'r') as f:
 		content = f.read().splitlines()
 		ret = [remove_stop_words(l, stop_words) for l in content]
@@ -111,12 +120,9 @@ if __name__ == '__main__':
 			content = line.split()
 			if content:
 				label_index = classify(content[1:])
-				#print("It is classified as " + lb.classes_[label_index] + ", should be " + content[0])
 				if (str(content[0]) == str(lb.classes_[int(label_index)])):
 					num_correct = num_correct + 1
-		#numEntries = input('Enter in the number of entries: ')
 		numEntries = sum(1 for line in open(filename))
-
 		print("Test: " + str(num_correct) + " out of " + str(numEntries) + " correct")
 	else:
 		exit(0)
