@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
 	model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 
-	history = model.fit(xtrain_count, train_y, epochs=1, verbose=2, validation_data=(xvalid_count, valid_y), batch_size=32)
+	history = model.fit(xtrain_count, train_y, epochs=3, verbose=2, validation_data=(xvalid_count, valid_y), batch_size=32)
 
 	loss, accuracy = model.evaluate(xtrain_count, train_y, verbose=True)
 	print("Training Accuracy: {:.6f}".format(accuracy))
@@ -114,8 +114,8 @@ if __name__ == '__main__':
 				#print("It is classified as " + lb.classes_[label_index] + ", should be " + content[0])
 				if (str(content[0]) == str(lb.classes_[int(label_index)])):
 					num_correct = num_correct + 1
-		numEntries = input('Enter in the number of entries: ')
-		# numEntries = 6099
+		#numEntries = input('Enter in the number of entries: ')
+		numEntries = sum(1 for line in open(filename))
 
 		print("Test: " + str(num_correct) + " out of " + str(numEntries) + " correct")
 	else:
