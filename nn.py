@@ -9,8 +9,8 @@ import keras.constraints
 pbartotal = 9
 
 # load the dataset
-filename = 'data/21labels.txt'
-testfile = 'data/4missing.txt'
+filename = 'original.txt'
+testfile = 'validate.txt'
 output_file = 'good_tweets.txt'
 output_file2 = 'good_tweets_2.txt'
 
@@ -48,10 +48,9 @@ labels, texts = [], []
 # sentiment -> 988
 # 21labels -> 22253
 
-numEntries = 22253
 for i, line in enumerate(data.split("\n")):
     content = line.split()
-    if(i < int(numEntries)):
+    if content:
         labels.append(content[0])
         texts.append(content[1:])
 
@@ -78,7 +77,8 @@ xvalid_count =  count_vect.transform(valid_x)
 
 input_dim = xtrain_count.shape[1]
 model = Sequential()
-numCategories = 15
+numCategories = 12
+model.add(layers.Dense(500, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 #model.add(layers.Dense(100, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 model.add(layers.Dense(numCategories, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 
@@ -136,14 +136,14 @@ labels, texts = [], []
 # sentiment -> 988
 print("Validating...")
 num_correct = 0
-numEntries = 24389
 for i, line in enumerate(data.split("\n")):
     content = line.split()
-    if(i < int(numEntries)):
+    if content:
         label_index = func(content[1:])
-        #print("It is " + str(content[0]) + ", should be " + lb.classes_[label_index] + " for label_index " + str(label_index))
+        print("It is classified as " + lb.classes_[label_index] + ", should be " + content[0]))
         if (str(content[0]) == str(lb.classes_[int(label_index)])):
             num_correct = num_correct + 1
 
+numEntries = 6099
 
 print("Test: " + str(num_correct) + " out of " + str(numEntries) + " correct")
