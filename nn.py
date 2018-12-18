@@ -37,7 +37,7 @@ def classify(text):
 
 if __name__ == '__main__':
 	# load the dataset
-	original_data = input('Enter the filename for the data set: ')
+	original_data = raw_input('Enter the filename for the data set: ')
 	#change filename for train/test set
 	output_file = 'good_tweets.txt'
 
@@ -82,7 +82,7 @@ if __name__ == '__main__':
 	#create model, and compile
 	input_dim = xtrain_count.shape[1]
 	model = Sequential()
-	numCategories = 12
+	numCategories = input('Enter the number of categories: ')
 	model.add(layers.Dense(100, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 	model.add(layers.Dense(numCategories, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 
@@ -95,9 +95,9 @@ if __name__ == '__main__':
 	loss, accuracy = model.evaluate(xvalid_count, valid_y, verbose=True)
 	print("Testing Accuracy:  {:.6f}".format(accuracy))
 
-	test_option = input('Would you like to continue to testing? (yes/no) ')
+	test_option = raw_input('Would you like to validate with new data? (yes/no) ')
 	if test_option == "yes":
-		validation_file = input('Enter the filename for the validation set: ')
+		validation_file = raw_input('Enter the filename for the validation set: ')
 		output_file2 = 'good_tweets_2.txt'
 		# create a copy of validation file w/o stop words
 		create_new_file(validation_file, stop_words, output_file2)
@@ -114,7 +114,8 @@ if __name__ == '__main__':
 				#print("It is classified as " + lb.classes_[label_index] + ", should be " + content[0])
 				if (str(content[0]) == str(lb.classes_[int(label_index)])):
 					num_correct = num_correct + 1
-		numEntries = 6099
+		numEntries = input('Enter in the number of entries: ')
+		# numEntries = 6099
 
 		print("Test: " + str(num_correct) + " out of " + str(numEntries) + " correct")
 	else:
