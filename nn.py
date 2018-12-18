@@ -6,13 +6,14 @@ from keras.models import Sequential
 from keras import layers
 import keras.constraints
 
-pbartotal = 9
-
 # load the dataset
+#change filename for train/test set
 filename = 'original.txt'
-testfile = 'validate.txt'
 output_file = 'good_tweets.txt'
+#change testfile for validation set
+testfile = 'validate.txt'
 output_file2 = 'good_tweets_2.txt'
+
 
 # get stop words list
 with open('english.txt', 'r') as f:
@@ -41,12 +42,6 @@ create_new_file(testfile, stop_words, output_file2)
 filename = 'good_tweets.txt'
 data = open(filename).read()  
 labels, texts = [], []
-# text4 -> 4642
-# text3 -> 3200
-# data24 -> 24158
-# data15 and data15unsorted -> 24389
-# sentiment -> 988
-# 21labels -> 22253
 
 for i, line in enumerate(data.split("\n")):
     content = line.split()
@@ -75,72 +70,49 @@ count_vect.fit(trainDF['text'])
 xtrain_count =  count_vect.transform(train_x)
 xvalid_count =  count_vect.transform(valid_x)
 
+#create model, and compile
 input_dim = xtrain_count.shape[1]
 model = Sequential()
 numCategories = 12
-model.add(layers.Dense(500, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
-#model.add(layers.Dense(100, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
+model.add(layers.Dense(100, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 model.add(layers.Dense(numCategories, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
-#model.summary()
 
 history = model.fit(xtrain_count, train_y, epochs=1, verbose=2, validation_data=(xvalid_count, valid_y), batch_size=32)
 
-weights = model.get_weights()
-loss, accuracy = model.evaluate(xtrain_count, train_y, verbose=False)
+loss, accuracy = model.evaluate(xtrain_count, train_y, verbose=True)
 print("Training Accuracy: {:.6f}".format(accuracy))
-loss, accuracy = model.evaluate(xvalid_count, valid_y, verbose=False)
+loss, accuracy = model.evaluate(xvalid_count, valid_y, verbose=True)
 print("Testing Accuracy:  {:.6f}".format(accuracy))
 
-def func(text):
+#func to classify individual tweets
+def classify(text):
 	text = str(text)
 	text = [text]
 	x_to_predict =  count_vect.transform(text)
 	result = model.predict(x_to_predict, verbose=0)
-	# fina max result[0]
+	# find max result[0]
 	label_index = np.argmax(result[0])	
 	return label_index
 
 
-def test(testDF, lb):
-	#labels = # convert pandas data frame to
-	text = testDF['text'] 
-	labels = testDF['label']
-	labels = lb.transform(labels)
-	num_correct = 0
-	for i, t in enumerate(text):
-		ind = func(t)
-		if ind == i:
-			num_correct = num_correct + 1
-	return num_correct
-
-# transform the training and validation data using count vectorizer object
-#x_to_predict =  count_vect.transform(text1)
-#result = model.predict(x_to_predict, verbose=1)
-j = 0
-for c in lb.classes_:
-    print(str(j) + ": " + c)
-    j = j + 1
-
-
-
+#####
+#TAYLOR TODO:
+#ask to continue to do the following,
+#default should be no
+#also move the testfile stuff down here, bc it will ask user for validation file
 # setting filename to the file without stop words
 filename = output_file2
 data = open(filename).read()  
 labels, texts = [], []
-# text4 -> 4642
-# text3 -> 3200
-# data24 -> 24158
-# data15 and data15unsorted -> 24389
-# sentiment -> 988
 print("Validating...")
 num_correct = 0
 for i, line in enumerate(data.split("\n")):
     content = line.split()
     if content:
-        label_index = func(content[1:])
-        print("It is classified as " + lb.classes_[label_index] + ", should be " + content[0]))
+        label_index = classify(content[1:])
+        #print("It is classified as " + lb.classes_[label_index] + ", should be " + content[0])
         if (str(content[0]) == str(lb.classes_[int(label_index)])):
             num_correct = num_correct + 1
 
