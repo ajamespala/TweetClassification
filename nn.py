@@ -36,7 +36,7 @@ trainDF = pandas.DataFrame()
 texts1=[' '.join(line) for line in texts]
 trainDF['text'] = texts1
 trainDF['label'] = labels
-
+print(trainDF['text'][1])
 p.progress(3, pbartotal)
 train_x, valid_x, train_y, valid_y = model_selection.train_test_split(trainDF['text'], trainDF['label'])
 
@@ -51,10 +51,10 @@ print(train_y)
 print('_________________________')
 lb = preprocessing.LabelBinarizer()
 valid_y = lb.fit_transform(valid_y)
+print(type(valid_y))
 print(lb)
 print(lb.classes_)
 print(valid_y)
-
 p.progress(5, pbartotal)
 # create a count vectorizer object 
 count_vect = CountVectorizer(analyzer='word',  stop_words = {'english'}, token_pattern='\w{1,}', max_features = 10000)
@@ -67,7 +67,7 @@ p.progress(6, pbartotal)
 xtrain_count =  count_vect.transform(train_x)
 xvalid_count =  count_vect.transform(valid_x)
 print(xtrain_count.toarray()[0])
-
+print(type(xtrain_count))
 p.progress(9, pbartotal)
 
 input_dim = xtrain_count.shape[1]
@@ -77,7 +77,7 @@ model = Sequential()
 #model.add(layers.Dense(100, input_dim=input_dim, activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 model.add(layers.Dense(15, input_dim = input_dim,  activation = 'linear', kernel_constraint  = keras.constraints.non_neg()))
 
-model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 model.summary()
 
 history = model.fit(xtrain_count, train_y, epochs=3, verbose=2, validation_data=(xvalid_count, valid_y), batch_size=32)
